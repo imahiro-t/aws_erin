@@ -65,7 +65,7 @@ defmodule AwsErin.Auth do
   defp get_canonical_uri(path) when is_nil(path) or path == "", do: "/"
   defp get_canonical_uri(path), do: path
 
-  defp get_canonical_query_string(query_params) do
+  defp get_canonical_query_string(query_params = %{}) do
     query_params
     |> Map.keys()
     |> Enum.reduce(Map.new(), fn x, acc ->
@@ -76,18 +76,18 @@ defmodule AwsErin.Auth do
     |> Enum.join("&")
   end
 
-  defp get_canonical_headers(headers) do
+  defp get_canonical_headers(headers = %{}) do
     headers
     |> Enum.sort_by(&(elem(&1, 0) |> String.downcase()))
-    |> Enum.map(&get_canonicalize_header/1)
+    |> Enum.map(&get_canonical_header/1)
     |> Enum.join()
   end
 
-  defp get_canonicalize_header({key, value}) do
+  defp get_canonical_header({key, value}) do
     "#{key |> String.downcase()}:#{value |> String.trim() |> String.replace(~r/\s+/, " ")}\n"
   end
 
-  defp get_signed_headers(headers) do
+  defp get_signed_headers(headers = %{}) do
     headers
     |> Map.keys()
     |> Enum.map(&String.downcase/1)

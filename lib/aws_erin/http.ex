@@ -10,7 +10,7 @@ defmodule AwsErin.Http do
   POST AWS rest api.
 
   """
-  def post(endpoint_uri, region_name, service_name, headers, request_payload) do
+  def post(endpoint_uri, region_name, service_name, headers = %{}, request_payload) do
     request(endpoint_uri, "POST", region_name, service_name, headers, request_payload)
   end
 
@@ -18,7 +18,7 @@ defmodule AwsErin.Http do
   PUT AWS rest api.
 
   """
-  def put(endpoint_uri, region_name, service_name, headers, request_payload) do
+  def put(endpoint_uri, region_name, service_name, headers = %{}, request_payload) do
     request(endpoint_uri, "PUT", region_name, service_name, headers, request_payload)
   end
 
@@ -26,7 +26,7 @@ defmodule AwsErin.Http do
   GET AWS rest api.
 
   """
-  def get(endpoint_uri, region_name, service_name, headers) do
+  def get(endpoint_uri, region_name, service_name, headers = %{}) do
     request(endpoint_uri, "GET", region_name, service_name, headers)
   end
 
@@ -34,7 +34,7 @@ defmodule AwsErin.Http do
   DELETE AWS rest api.
 
   """
-  def delete(endpoint_uri, region_name, service_name, headers) do
+  def delete(endpoint_uri, region_name, service_name, headers = %{}) do
     request(endpoint_uri, "DELETE", region_name, service_name, headers)
   end
 
@@ -47,7 +47,7 @@ defmodule AwsErin.Http do
         http_request_method,
         region_name,
         service_name,
-        headers,
+        headers = %{},
         request_payload \\ ""
       ) do
     aws_access_key = Util.fetch_env!(:aws_access_key_id)
