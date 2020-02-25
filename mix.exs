@@ -4,7 +4,7 @@ defmodule AwsErin.MixProject do
   def project do
     [
       app: :aws_erin,
-      version: "0.2.1",
+      version: "0.3.0",
       elixir: "~> 1.9",
       description: description(),
       package: package(),
