@@ -25,7 +25,7 @@ defmodule AwsErin.S3 do
   def put_object(bucket_name, key_name, body, options \\ []) do
     headers =
       Map.new()
-      |> Map.put("content-length", "#{body |> String.length()}")
+      |> Map.put("content-length", "#{body |> byte_size}")
 
     query_params = Map.new()
     region_name = options |> Util.get_region_name
