@@ -69,7 +69,7 @@ defmodule AwsErin.Auth do
     query_params
     |> Map.keys()
     |> Enum.reduce(Map.new(), fn x, acc ->
-      acc |> Map.put(x |> URI.encode(), query_params |> Map.get(x) || "" |> URI.encode())
+      acc |> Map.put(x |> URI.encode(), (query_params |> Map.get(x) || "") |> URI.encode())
     end)
     |> Enum.sort_by(&elem(&1, 0))
     |> Enum.map(&"#{elem(&1, 0)}=#{elem(&1, 1)}")
