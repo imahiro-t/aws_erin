@@ -80,10 +80,7 @@ defmodule AwsErin.Http do
       headers
       |> Map.put("Authorization", authorization)
 
-    case HTTPoison.request(http_request_method, endpoint_uri, request_payload, headers) do
-      {:ok, %{body: body}} -> body
-      {:error, %{reason: reason}} -> {:error, reason}
-    end
+    HTTPoison.request(http_request_method, endpoint_uri, request_payload, headers)
   end
 
   defp get_aws_access_key(options) do
