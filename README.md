@@ -4,18 +4,25 @@ AWS SDK for elixir. Authentication and http access is done. It is under construc
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `aws_erin` to your list of dependencies in `mix.exs`:
+The package can be installed by adding `aws_erin` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:aws_erin, "~> 0.1.0"}
+    {:aws_erin, "~> 0.2.0"}
   ]
 end
 ```
+## Basic Usage
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/aws_erin](https://hexdocs.pm/aws_erin).
+```elixir
+options = [
+  aws_access_key_id: "AWS_ACCESS_KEY_ID",
+  aws_secret_access_key: "AWS_SECRET_ACCESS_KEY",
+  aws_session_token: "AWS_SESSION_TOKEN", # if any
+  aws_region: "AWS_REGION"
+]
+AwsErin.S3.get_object("bucket_name", "key_name", options)
+```
 
+The docs can be found at [https://hexdocs.pm/aws_erin](https://hexdocs.pm/aws_erin).

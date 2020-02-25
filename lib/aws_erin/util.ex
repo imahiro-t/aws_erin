@@ -47,14 +47,19 @@ defmodule AwsErin.Util do
 
   @doc """
   Get configuration value for :aws_erin's application.
-
-  ## Examples
-
-      iex> AwsErin.Util.fetch_env!(:aws_default_region)
-      "ap-northeast-1"
-      
   """
   def fetch_env!(key) do
     Application.fetch_env!(:aws_erin, key)
+  end
+
+  def get_region_name(options) do
+    case Keyword.get(options, :aws_region) do
+      nil -> 
+        case fetch_env!(:aws_default_region) do
+          nil -> "us-east-1"
+          region -> region
+        end
+      region -> region
+    end
   end
 end

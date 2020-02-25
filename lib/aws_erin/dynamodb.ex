@@ -11,7 +11,7 @@ defmodule AwsErin.DynamoDB do
 
   """
   def list_tables(options \\ []) do
-    region_name = Keyword.get(options, :region_name, Util.fetch_env!(:aws_default_region))
+    region_name = options |> Util.get_region_name
 
     endpoint_uri = %URI{
       host: "dynamodb.#{region_name}.amazonaws.com",
@@ -31,7 +31,8 @@ defmodule AwsErin.DynamoDB do
       region_name,
       "dynamodb",
       headers,
-      body
+      body,
+      options
     )
   end
 end
