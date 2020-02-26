@@ -9,7 +9,7 @@ The package can be installed by adding `aws_erin` to your list of dependencies i
 ```elixir
 def deps do
   [
-    {:aws_erin, "~> 0.3.2"}
+    {:aws_erin, "~> 0.3.3"}
   ]
 end
 ```
