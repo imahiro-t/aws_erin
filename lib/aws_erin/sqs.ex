@@ -36,7 +36,7 @@ defmodule AwsErin.SQS do
   defp response(res) do
     case res do
       {:ok, %{body: body}} ->
-        reg = ~r/\A<\?xml version="1.0"\?><ErrorResponse xmlns="http:\/\/queue.amazonaws.com\/doc\/2012-11-05\/"><Error><Type>Sender<\/Type><Code>(?<code>.*?)<\/Code>.*<Message>(?<message>.*?)<\/Message>.*<\/ErrorResponse>\z/
+        reg = ~r/\A<\?xml version="1.0"\?><ErrorResponse xmlns="http:\/\/queue.amazonaws.com\/doc\/2012-11-05\/"><Error><Type>Sender<\/Type><Code>(?<code>.*?)<\/Code>.*<Message>(?<message>.*?)<\/Message>.*/
         case reg |> Regex.named_captures(body) do
           %{"code" => code, "message" => message} -> {:error, {code, message}}
           _ -> {:ok, body}

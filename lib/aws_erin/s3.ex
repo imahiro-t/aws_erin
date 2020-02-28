@@ -68,7 +68,7 @@ defmodule AwsErin.S3 do
   defp response(res) do
     case res do
       {:ok, %{body: body}} ->
-        reg = ~r/\A<\?xml version="1.0" encoding="UTF-8"\?>\n<Error><Code>(?<code>.*?)<\/Code>.*<Message>(?<message>.*?)<\/Message>.*<\/Error>\z/
+        reg = ~r/\A<\?xml version="1.0" encoding="UTF-8"\?>\n<Error><Code>(?<code>.*?)<\/Code>.*<Message>(?<message>.*?)<\/Message>.*/
         case reg |> Regex.named_captures(body) do
           %{"code" => code, "message" => message} -> {:error, {code, message}}
           _ -> {:ok, body}
