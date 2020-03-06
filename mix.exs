@@ -4,7 +4,7 @@ defmodule AwsErin.MixProject do
   def project do
     [
       app: :aws_erin,
-      version: "0.3.4",
+      version: "0.3.5",
       elixir: "~> 1.9",
       description: description(),
       package: package(),
@@ -40,7 +40,8 @@ defmodule AwsErin.MixProject do
   defp deps do
     [
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:httpoison, "~> 1.6.2"}
+      {:httpoison, "~> 1.6.2"},
+      {:jason, "~> 1.1"}
     ]
   end
 end
