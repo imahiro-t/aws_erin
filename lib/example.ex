@@ -14,7 +14,9 @@ defmodule Example do
   def get_dynamodb_item(value) do
     request = %AwsErin.DynamoDB.GetItem.Request{
       table_name: "MyTable", 
-      key: %{id: %{S: value}},
+      key: [
+        %AwsErin.DynamoDB.Common.Key{name: "id", value: value}
+      ],
       projection_expression: "id",
       consistent_read: true,
       return_consumed_capacity: "TOTAL"
@@ -25,8 +27,11 @@ defmodule Example do
   def put_dynamodb_item(value) do
     ttl = (DateTime.utc_now |> DateTime.to_unix) + 120
     request = %AwsErin.DynamoDB.PutItem.Request{
-      table_name: "MyTable", 
-      item: %{id: %{S: value}, ttl: %{N: "#{ttl}"}},
+      table_name: "MyTable",
+      item: [
+        %AwsErin.DynamoDB.Common.Key{name: "id", value: value},
+        %AwsErin.DynamoDB.Common.Key{name: "ttl", value: ttl}
+      ],
       condition_expression: "attribute_not_exists(id)",
     }
     AwsErin.DynamoDB.put_item(request, region_name: "ap-northeast-1")
@@ -35,7 +40,9 @@ defmodule Example do
   def delete_dynamodb_item(value) do
     request = %AwsErin.DynamoDB.DeleteItem.Request{
       table_name: "MyTable", 
-      key: %{id: %{S: value}},
+      key: [
+        %AwsErin.DynamoDB.Common.Key{name: "id", value: value}
+      ]
     }
     AwsErin.DynamoDB.delete_item(request, region_name: "ap-northeast-1")
   end

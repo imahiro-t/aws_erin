@@ -2,6 +2,7 @@ defmodule AwsErin.DynamoDB.DeleteItem do
   alias AwsErin.DynamoDB.Common.StructMap
   alias AwsErin.DynamoDB.Common.Key
   alias AwsErin.DynamoDB.Common.ExpressionAttributeName
+  alias AwsErin.DynamoDB.Common.ExpressionAttributeValue
   alias AwsErin.DynamoDB.Common.Attribute
   alias AwsErin.DynamoDB.Common.ConsumedCapacity
   alias AwsErin.DynamoDB.Common.ItemCollectionMetrics
