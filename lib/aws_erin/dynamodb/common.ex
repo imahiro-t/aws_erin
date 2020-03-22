@@ -1,41 +1,48 @@
 defmodule AwsErin.DynamoDB.Common do
-  alias AwsErin.DynamoDB.Common.Value
+  alias AwsErin.DynamoDB.Common.AttributeValue
   alias AwsErin.DynamoDB.Common.StructList
   alias AwsErin.DynamoDB.Common.StructMap
+  alias AwsErin.DynamoDB.Common.AttributeUtil
   alias AwsErin.DynamoDB.Common.Key
+  alias AwsErin.DynamoDB.Common.Item
+  alias AwsErin.DynamoDB.Common.Attribute
   alias AwsErin.DynamoDB.Common.RequestItem
   alias AwsErin.DynamoDB.Common.ConsumedCapacity
-  alias AwsErin.DynamoDB.Common.SecondaryIndex
+  alias AwsErin.DynamoDB.Common.Capacity
   alias AwsErin.DynamoDB.Common.Table
   alias AwsErin.DynamoDB.Common.UnprocessedKey
   alias AwsErin.DynamoDB.Common.ExpressionAttributeName
-  alias AwsErin.DynamoDB.Common.Item
-  alias AwsErin.DynamoDB.Common.ExpressionAttributeValue
-  alias AwsErin.DynamoDB.Common.Attribute
   alias AwsErin.DynamoDB.Common.ItemCollectionMetrics
-  alias AwsErin.DynamoDB.Common.ItemCollectionKey
 
-  defmodule Value do
-    def to_map(value) when value |> is_nil, do: %{"NULL" => true}
-    def to_map(value) when value |> is_boolean, do: %{"BOOL" => value}
-    def to_map(value) when value |> is_number, do: %{"N" => value |> to_string}
-    def to_map(value) when value |> is_binary, do: %{"S" => value}
-    def to_map(value) when value |> is_map, do: %{"M" => value}
-    def to_map(value) when value |> is_list do
+  defmodule AttributeValue do
+    def to(value, blob: true) when value |> is_binary, do: %{"B" => value}
+    def to(value, blob: true) when value |> is_list do
+      cond do
+        value |> Enum.all?(&is_binary/1) -> %{"BS" => value}
+      end
+    end
+    def to(value) when value |> is_nil, do: %{"NULL" => true}
+    def to(value) when value |> is_boolean, do: %{"BOOL" => value}
+    def to(value) when value |> is_number, do: %{"N" => value |> to_string}
+    def to(value) when value |> is_binary, do: %{"S" => value}
+    def to(value) when value |> is_map, do: %{"M" => value |> Enum.reduce(%{}, fn {key, value}, acc -> acc |> Map.merge(%{key => value |> AttributeValue.to}) end)}
+    def to(value) when value |> is_list do
       cond do
         value |> Enum.all?(&is_binary/1) -> %{"SS" => value}
         value |> Enum.all?(&is_number/1) -> %{"NS" => value |> Enum.map(&to_string/1)}
-        true -> %{"L" => value}
+        true -> %{"L" => value |> Enum.map(&AttributeValue.to/1)}
       end
     end
-    def from_map(%{"NULL" => true}), do: nil
-    def from_map(%{"BOOL" => value}), do: value
-    def from_map(%{"N" => value}), do: value |> to_number
-    def from_map(%{"S" => value}), do: value
-    def from_map(%{"M" => value}), do: value
-    def from_map(%{"SS" => value}), do: value
-    def from_map(%{"NS" => value}), do: value |> Enum.map(&to_number/1)
-    def from_map(%{"L" => value}), do: value
+    def from(%{"NULL" => true}), do: nil
+    def from(%{"BOOL" => value}), do: value
+    def from(%{"N" => value}), do: value |> to_number
+    def from(%{"S" => value}), do: value
+    def from(%{"B" => value}), do: value
+    def from(%{"M" => value}), do: value |> Enum.reduce(%{}, fn {key, value}, acc -> acc |> Map.merge(%{key => value |> AttributeValue.from}) end)
+    def from(%{"SS" => value}), do: value
+    def from(%{"BS" => value}), do: value
+    def from(%{"NS" => value}), do: value |> Enum.map(&to_number/1)
+    def from(%{"L" => value}), do: value |> Enum.map(&AttributeValue.from/1)
     defp to_number(value) do
       case value |> Integer.parse do
         {i, ""} -> i
@@ -55,20 +62,66 @@ defmodule AwsErin.DynamoDB.Common do
     def to_struct(nil, _struct), do: nil
     def to_struct(map, struct) when map |> is_map, do: map |> Enum.map(fn {key, value} -> %{key => value} |> struct.to_struct end)
   end
+  defmodule AttributeUtil do
+    def to_map(nil), do: nil
+    def to_map(list) when list |> is_list, do: list |> Enum.reduce(%{}, fn x, acc -> acc |> Map.merge(%{x.name => x.value}) end)
+    def to_list(nil, _struct), do: nil
+    def to_list(map, struct) when map |> is_map, do: map |> Enum.map(fn {key, value} -> struct(struct, %{name: key, value: value}) end)
+  end
+
   defmodule Key do
+    defstruct [
+      :name,
+      :value,
+      :options
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      if (struct.options |> is_nil) do
+        %{struct.name => struct.value |> AttributeValue.to}
+      else
+        %{struct.name => struct.value |> AttributeValue.to(struct.options)}
+      end
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %Key{
+        name: map |> Map.keys |> List.first,
+        value: map |> Map.values |> List.first |> AttributeValue.from
+      }
+    end
+  end
+  defmodule Item do
     defstruct [
       :name,
       :value
     ]
     def to_map(nil), do: nil
     def to_map(struct) do
-      %{struct.name => struct.value |> Value.to_map}
+      %{struct.name => struct.value |> AttributeValue.to}
     end
     def to_struct(nil), do: nil
     def to_struct(map) do
-      %Key{
+      %Item{
         name: map |> Map.keys |> List.first,
-        value: map |> Map.values |> List.first |> Value.from_map
+        value: map |> Map.values |> List.first |> AttributeValue.from
+      }
+    end
+  end
+  defmodule Attribute do
+    defstruct [
+      :name,
+      :value
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{struct.name => struct.value |> AttributeValue.to}
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %Attribute{
+        name: map |> Map.keys |> List.first,
+        value: map |> Map.values |> List.first |> AttributeValue.from
       }
     end
   end
@@ -115,8 +168,8 @@ defmodule AwsErin.DynamoDB.Common do
     def to_map(struct) do
       %{
         "CapacityUnits" => struct.capacity_units,
-        "GlobalSecondaryIndexes" => struct.global_secondary_indexes |> StructMap.to_map(SecondaryIndex),
-        "LocalSecondaryIndexes" => struct.local_secondary_indexes |> StructMap.to_map(SecondaryIndex),
+        "GlobalSecondaryIndexes" => struct.global_secondary_indexes |> StructMap.to_map(Capacity),
+        "LocalSecondaryIndexes" => struct.local_secondary_indexes |> StructMap.to_map(Capacity),
         "ReadCapacityUnits" => struct.read_capacity_units,
         "Table" => struct.table |> Table.to_map,
         "TableName" => struct.table_name,
@@ -127,8 +180,8 @@ defmodule AwsErin.DynamoDB.Common do
     def to_struct(map) do
       %ConsumedCapacity{
         capacity_units: map |> Map.get("CapacityUnits"),
-        global_secondary_indexes: map |> Map.get("GlobalSecondaryIndexes") |> StructMap.to_struct(SecondaryIndex),
-        local_secondary_indexes: map |> Map.get("LocalSecondaryIndexes") |> StructMap.to_struct(SecondaryIndex),
+        global_secondary_indexes: map |> Map.get("GlobalSecondaryIndexes") |> StructMap.to_struct(Capacity),
+        local_secondary_indexes: map |> Map.get("LocalSecondaryIndexes") |> StructMap.to_struct(Capacity),
         read_capacity_units: map |> Map.get("ReadCapacityUnits"),
         table: map |> Map.get("Table") |> Table.to_struct,
         table_name: map |> Map.get("TableName"),
@@ -136,7 +189,7 @@ defmodule AwsErin.DynamoDB.Common do
       }
     end
   end
-  defmodule SecondaryIndex do
+  defmodule Capacity do
     defstruct [
       :name,
       :capacity_units,
@@ -154,7 +207,7 @@ defmodule AwsErin.DynamoDB.Common do
     def to_struct(nil), do: nil
     def to_struct(map) do
       value = map |> Map.values |> List.first
-      %SecondaryIndex{
+      %Capacity{
         name: map |> Map.keys |> List.first,
         capacity_units: value |> Map.get("CapacityUnits"),
         read_capacity_units: value |> Map.get("ReadCapacityUnits"),
@@ -248,57 +301,6 @@ defmodule AwsErin.DynamoDB.Common do
       }
     end
   end
-  defmodule Item do
-    defstruct [
-      :name,
-      :value
-    ]
-    def to_map(nil), do: nil
-    def to_map(struct) do
-      %{struct.name => struct.value |> Value.to_map}
-    end
-    def to_struct(nil), do: nil
-    def to_struct(map) do
-      %Item{
-        name: map |> Map.keys |> List.first,
-        value: map |> Map.values |> List.first |> Value.from_map
-      }
-    end
-  end
-  defmodule ExpressionAttributeValue do
-    defstruct [
-      :name,
-      :value
-    ]
-    def to_map(nil), do: nil
-    def to_map(struct) do
-      %{struct.name => struct.value |> Value.to_map}
-    end
-    def to_struct(nil), do: nil
-    def to_struct(map) do
-      %ExpressionAttributeValue{
-        name: map |> Map.keys |> List.first,
-        value: map |> Map.values |> List.first |> Value.from_map
-      }
-    end
-  end
-  defmodule Attribute do
-    defstruct [
-      :name,
-      :value
-    ]
-    def to_map(nil), do: nil
-    def to_map(struct) do
-      %{struct.name => struct.value |> Value.to_map}
-    end
-    def to_struct(nil), do: nil
-    def to_struct(map) do
-      %Attribute{
-        name: map |> Map.keys |> List.first,
-        value: map |> Map.values |> List.first |> Value.from_map
-      }
-    end
-  end
   defmodule ItemCollectionMetrics do
     defstruct [
       :item_collection_key,
@@ -307,32 +309,15 @@ defmodule AwsErin.DynamoDB.Common do
     def to_map(nil), do: nil
     def to_map(struct) do
       %{
-        "ItemCollectionKey" => struct.item_collection_key |> StructMap.to_map(ItemCollectionKey),
+        "ItemCollectionKey" => struct.item_collection_key |> StructMap.to_map(Key),
         "SizeEstimateRangeGB" => struct.size_estimate_range_gb
       }
     end
     def to_struct(nil), do: nil
     def to_struct(map) do
       %ItemCollectionMetrics{
-        item_collection_key: map |> Map.get("ItemCollectionKey") |> StructMap.to_struct(ItemCollectionKey),
+        item_collection_key: map |> Map.get("ItemCollectionKey") |> StructMap.to_struct(Key),
         size_estimate_range_gb: map |> Map.get("SizeEstimateRangeGB")
-      }
-    end
-  end
-  defmodule ItemCollectionKey do
-    defstruct [
-      :name,
-      :value
-    ]
-    def to_map(nil), do: nil
-    def to_map(struct) do
-      %{struct.name => struct.value |> Value.to_map}
-    end
-    def to_struct(nil), do: nil
-    def to_struct(map) do
-      %ItemCollectionKey{
-        name: map |> Map.keys |> List.first,
-        value: map |> Map.values |> List.first |> Value.from_map
       }
     end
   end
