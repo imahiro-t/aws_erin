@@ -13,11 +13,11 @@ defmodule Example do
 
   def get_dynamodb_item(value) do
     request = %AwsErin.DynamoDB.GetItem.Request{
-      TableName: "MyTable", 
-      Key: %{LockKey: %{S: value}},
-      ProjectionExpression: "LockKey",
-      ConsistentRead: true,
-      ReturnConsumedCapacity: "TOTAL"
+      table_name: "MyTable", 
+      key: %{id: %{S: value}},
+      projection_expression: "id",
+      consistent_read: true,
+      return_consumed_capacity: "TOTAL"
     }
     AwsErin.DynamoDB.get_item(request, region_name: "ap-northeast-1")
   end
@@ -25,17 +25,17 @@ defmodule Example do
   def put_dynamodb_item(value) do
     ttl = (DateTime.utc_now |> DateTime.to_unix) + 120
     request = %AwsErin.DynamoDB.PutItem.Request{
-      TableName: "MyTable", 
-      Item: %{LockKey: %{S: value}, ttl: %{N: "#{ttl}"}},
-      ConditionExpression: "attribute_not_exists(LockKey)",
+      table_name: "MyTable", 
+      item: %{id: %{S: value}, ttl: %{N: "#{ttl}"}},
+      condition_expression: "attribute_not_exists(id)",
     }
     AwsErin.DynamoDB.put_item(request, region_name: "ap-northeast-1")
   end
 
   def delete_dynamodb_item(value) do
     request = %AwsErin.DynamoDB.DeleteItem.Request{
-      TableName: "MyTable", 
-      Key: %{LockKey: %{S: value}},
+      table_name: "MyTable", 
+      key: %{id: %{S: value}},
     }
     AwsErin.DynamoDB.delete_item(request, region_name: "ap-northeast-1")
   end
