@@ -4,10 +4,12 @@ defmodule AwsErin.DynamoDB.Common do
   alias AwsErin.DynamoDB.Common.StructMap
   alias AwsErin.DynamoDB.Common.Key
   alias AwsErin.DynamoDB.Common.RequestItem
-  alias AwsErin.DynamoDB.Common.UnprocessedKey
   alias AwsErin.DynamoDB.Common.ConsumedCapacity
   alias AwsErin.DynamoDB.Common.SecondaryIndex
   alias AwsErin.DynamoDB.Common.Table
+  alias AwsErin.DynamoDB.Common.UnprocessedKey
+  alias AwsErin.DynamoDB.Common.ExpressionAttributeName
+  alias AwsErin.DynamoDB.Common.Item
 
   defmodule StructList do
     def to_map(nil, _struct), do: nil
@@ -194,6 +196,40 @@ defmodule AwsErin.DynamoDB.Common do
         keys: value |> Map.get("Keys") |> StructList.to_struct(Key),
         projection_expression: value |> Map.get("ProjectionExpression"),
         consistent_read: value |> Map.get("ConsistentRead")
+      }
+    end
+  end
+  defmodule ExpressionAttributeName do
+    defstruct [
+      :name,
+      :value
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{struct.name => struct.value}
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %ExpressionAttributeName{
+        name: map |> Map.keys |> List.first,
+        value: map |> Map.values |> List.first
+      }
+    end
+  end
+  defmodule Item do
+    defstruct [
+      :name,
+      :value
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{struct.name => struct.value |> Value.to_map}
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %Item{
+        name: map |> Map.keys |> List.first,
+        value: map |> Map.values |> List.first |> Value.from_map
       }
     end
   end
