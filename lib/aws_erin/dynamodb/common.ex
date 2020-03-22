@@ -10,6 +10,10 @@ defmodule AwsErin.DynamoDB.Common do
   alias AwsErin.DynamoDB.Common.UnprocessedKey
   alias AwsErin.DynamoDB.Common.ExpressionAttributeName
   alias AwsErin.DynamoDB.Common.Item
+  alias AwsErin.DynamoDB.Common.ExpressionAttributeValue
+  alias AwsErin.DynamoDB.Common.Attribute
+  alias AwsErin.DynamoDB.Common.ItemCollectionMetrics
+  alias AwsErin.DynamoDB.Common.ItemCollectionKey
 
   defmodule StructList do
     def to_map(nil, _struct), do: nil
@@ -228,6 +232,77 @@ defmodule AwsErin.DynamoDB.Common do
     def to_struct(nil), do: nil
     def to_struct(map) do
       %Item{
+        name: map |> Map.keys |> List.first,
+        value: map |> Map.values |> List.first |> Value.from_map
+      }
+    end
+  end
+  defmodule ExpressionAttributeValue do
+    defstruct [
+      :name,
+      :value
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{struct.name => struct.value |> Value.to_map}
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %ExpressionAttributeValue{
+        name: map |> Map.keys |> List.first,
+        value: map |> Map.values |> List.first |> Value.from_map
+      }
+    end
+  end
+  defmodule Attribute do
+    defstruct [
+      :name,
+      :value
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{struct.name => struct.value |> Value.to_map}
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %Attribute{
+        name: map |> Map.keys |> List.first,
+        value: map |> Map.values |> List.first |> Value.from_map
+      }
+    end
+  end
+  defmodule ItemCollectionMetrics do
+    defstruct [
+      :item_collection_key,
+      :size_estimate_range_gb
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{
+        "ItemCollectionKey" => struct.item_collection_key |> StructMap.to_map(ItemCollectionKey),
+        "SizeEstimateRangeGB" => struct.size_estimate_range_gb
+      }
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %ItemCollectionMetrics{
+        item_collection_key: map |> Map.get("ItemCollectionKey") |> StructMap.to_struct(ItemCollectionKey),
+        size_estimate_range_gb: map |> Map.get("SizeEstimateRangeGB")
+      }
+    end
+  end
+  defmodule ItemCollectionKey do
+    defstruct [
+      :name,
+      :value
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{struct.name => struct.value |> Value.to_map}
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %ItemCollectionKey{
         name: map |> Map.keys |> List.first,
         value: map |> Map.values |> List.first |> Value.from_map
       }

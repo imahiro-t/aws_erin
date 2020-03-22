@@ -6,8 +6,9 @@ defmodule AwsErin.DynamoDB.Error do
   defmodule RequestLimitExceeded, do: defstruct [ :message ]
   defmodule ResourceNotFoundException, do: defstruct [ :message ]
   defmodule ValidationException, do: defstruct [ :message ]
-
   defmodule ConditionalCheckFailedException, do: defstruct [ :message ]
+  defmodule ItemCollectionSizeLimitExceededException, do: defstruct [ :message ]
+  defmodule TransactionConflictException, do: defstruct [ :message ]
 
   def to_error(500, code, message) do
     cond do
@@ -21,8 +22,10 @@ defmodule AwsErin.DynamoDB.Error do
       code |> String.ends_with?("ProvisionedThroughputExceededException") -> %ProvisionedThroughputExceededException{message: message}
       code |> String.ends_with?("RequestLimitExceeded") -> %RequestLimitExceeded{message: message}
       code |> String.ends_with?("ResourceNotFoundException") -> %ResourceNotFoundException{message: message}
-      code |> String.ends_with?("ConditionalCheckFailedException") -> %ConditionalCheckFailedException{message: message}
       code |> String.ends_with?("ValidationException") -> %ValidationException{message: message}
+      code |> String.ends_with?("ConditionalCheckFailedException") -> %ConditionalCheckFailedException{message: message}
+      code |> String.ends_with?("ItemCollectionSizeLimitExceededException") -> %ItemCollectionSizeLimitExceededException{message: message}
+      code |> String.ends_with?("TransactionConflictException") -> %TransactionConflictException{message: message}
       true -> %UnknownServerError{message: "#{code} #{message}"}
     end
   end
