@@ -85,20 +85,23 @@ defmodule AwsErin.Http do
 
   defp get_aws_access_key(options) do
     case options |> Keyword.get(:aws_access_key_id) do
-      nil -> Util.fetch_env!(:aws_access_key_id)
+      nil -> System.get_env("AWS_ACCESS_KEY_ID")
       value -> value
     end
   end
 
   defp get_aws_secret_key(options) do
     case options |> Keyword.get(:aws_secret_access_key) do
-      nil -> Util.fetch_env!(:aws_secret_access_key)
+      nil -> System.get_env("AWS_SECRET_ACCESS_KEY")
       value -> value
     end
   end
 
   defp get_aws_session_token(options) do
-    options |> Keyword.get(:aws_session_token)
+    case options |> Keyword.get(:aws_session_token) do
+      nil -> System.get_env("AWS_SESSION_TOKEN")
+      value -> value
+    end
   end
 
   defp get_date_time do
