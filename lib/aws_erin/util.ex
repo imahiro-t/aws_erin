@@ -1,4 +1,5 @@
 defmodule AwsErin.Util do
+  use Bitwise
   @moduledoc """
   Documentation for Util.
   """
@@ -43,6 +44,14 @@ defmodule AwsErin.Util do
   """
   def hmac(secret, str) do
     :crypto.hmac(:sha256, secret, str)
+  end
+
+  @doc """
+  Generate UUID4 value.
+  """
+  def uuid() do
+    <<b1 :: binary-size(5), x, b2 :: binary-size(1), y, b3 :: binary-size(8)>> = :crypto.strong_rand_bytes(16)
+    (b1 <> <<(x &&& 0x0f) ||| 0x40>> <> b2 <> <<(y &&& 0x3f) ||| 0x80>> <> b3) |> Base.encode16
   end
 
   @doc """

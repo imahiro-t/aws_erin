@@ -6,6 +6,7 @@ defmodule AwsErin.DynamoDB do
   alias AwsErin.DynamoDB.GetItem
   alias AwsErin.DynamoDB.BatchGetItem
   alias AwsErin.DynamoDB.PutItem
+  alias AwsErin.DynamoDB.UpdateItem
   alias AwsErin.DynamoDB.DeleteItem
   @dynamodb "dynamodb"
   @common_headers %{"Content-Type" => "application/x-amz-json-1.0"}
@@ -15,59 +16,52 @@ defmodule AwsErin.DynamoDB do
   """
 
   @doc """
-  BatchGetItem.
-
+  GetItem.
   """
-  @spec batch_get_item(%BatchGetItem.Request{}, list()) :: {:ok, %BatchGetItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
-  def batch_get_item(request = %{__struct__: BatchGetItem.Request}, options \\ []) do
-    headers = @common_headers
-    |> Map.put("X-Amz-Target", "DynamoDB_20120810.BatchGetItem")
-    region_name = options |> Util.get_region_name
-    endpoint_uri = get_endpoint_uri(region_name)
-    Http.post(endpoint_uri, region_name, @dynamodb, headers, request |> BatchGetItem.Request.to_map |> Jason.encode!, options)
-    |> to_response(BatchGetItem.Response)
+  @spec get_item(%GetItem.Request{}, list()) :: {:ok, %GetItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
+  def get_item(%GetItem.Request{} = request, options \\ []) do
+    process_request(request, options, "GetItem", GetItem.Request, GetItem.Response)
   end
 
   @doc """
-  GetItem.
-
+  BatchGetItem.
   """
-  @spec get_item(%GetItem.Request{}, list()) :: {:ok, %GetItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
-  def get_item(request = %{__struct__: GetItem.Request}, options \\ []) do
-    headers = @common_headers
-    |> Map.put("X-Amz-Target", "DynamoDB_20120810.GetItem")
-    region_name = options |> Util.get_region_name
-    endpoint_uri = get_endpoint_uri(region_name)
-    Http.post(endpoint_uri, region_name, @dynamodb, headers, request |> GetItem.Request.to_map |> Jason.encode!, options)
-    |> to_response(GetItem.Response)
+  @spec batch_get_item(%BatchGetItem.Request{}, list()) :: {:ok, %BatchGetItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
+  def batch_get_item(%BatchGetItem.Request{} = request, options \\ []) do
+    process_request(request, options, "BatchGetItem", BatchGetItem.Request, BatchGetItem.Response)
   end
 
   @doc """
   PutItem.
-
   """
   @spec put_item(%PutItem.Request{}, list()) :: {:ok, %PutItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
-  def put_item(request = %{__struct__: PutItem.Request}, options \\ []) do
-    headers = @common_headers
-    |> Map.put("X-Amz-Target", "DynamoDB_20120810.PutItem")
-    region_name = options |> Util.get_region_name
-    endpoint_uri = get_endpoint_uri(region_name)
-    Http.post(endpoint_uri, region_name, @dynamodb, headers, request |> PutItem.Request.to_map |> Jason.encode!, options)
-    |> to_response(PutItem.Response)
+  def put_item(%PutItem.Request{} = request, options \\ []) do
+    process_request(request, options, "PutItem", PutItem.Request, PutItem.Response)
+  end
+
+  @doc """
+  UpdateItem.
+  """
+  @spec update_item(%UpdateItem.Request{}, list()) :: {:ok, %UpdateItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
+  def update_item(%UpdateItem.Request{} = request, options \\ []) do
+    process_request(request, options, "UpdateItem", UpdateItem.Request, UpdateItem.Response)
   end
 
   @doc """
   DeleteItem.
-
   """
   @spec delete_item(%DeleteItem.Request{}, list()) :: {:ok, %DeleteItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
-  def delete_item(request = %{__struct__: DeleteItem.Request}, options \\ []) do
+  def delete_item(%DeleteItem.Request{} = request, options \\ []) do
+    process_request(request, options, "DeleteItem", DeleteItem.Request, DeleteItem.Response)
+  end
+
+  defp process_request(request, options, name, request_struct, response_struct) do
     headers = @common_headers
-    |> Map.put("X-Amz-Target", "DynamoDB_20120810.DeleteItem")
+    |> Map.put("X-Amz-Target", "DynamoDB_20120810.#{name}")
     region_name = options |> Util.get_region_name
     endpoint_uri = get_endpoint_uri(region_name)
-    Http.post(endpoint_uri, region_name, @dynamodb, headers, request |> DeleteItem.Request.to_map |> Jason.encode!, options)
-    |> to_response(DeleteItem.Response)
+    Http.post(endpoint_uri, region_name, @dynamodb, headers, request |> request_struct.to_map |> Jason.encode!, options)
+    |> to_response(response_struct)
   end
 
   defp get_endpoint_uri(region_name) do
