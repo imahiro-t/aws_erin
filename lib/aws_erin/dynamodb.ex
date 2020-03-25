@@ -9,6 +9,7 @@ defmodule AwsErin.DynamoDB do
   alias AwsErin.DynamoDB.DeleteItem
   alias AwsErin.DynamoDB.BatchGetItem
   alias AwsErin.DynamoDB.BatchWriteItem
+  alias AwsErin.DynamoDB.Query
   @dynamodb "dynamodb"
   @common_headers %{"Content-Type" => "application/x-amz-json-1.0"}
 
@@ -62,6 +63,14 @@ defmodule AwsErin.DynamoDB do
   @spec batch_write_item(%BatchWriteItem.Request{}, list()) :: {:ok, %BatchWriteItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
   def batch_write_item(%BatchWriteItem.Request{} = request, options \\ []) do
     process_request(request, options, "BatchWriteItem", BatchWriteItem.Request, BatchWriteItem.Response)
+  end
+
+  @doc """
+  Query.
+  """
+  @spec query(%Query.Request{}, list()) :: {:ok, %Query.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
+  def query(%Query.Request{} = request, options \\ []) do
+    process_request(request, options, "Query", Query.Request, Query.Response)
   end
 
   defp process_request(request, options, name, request_struct, response_struct) do
