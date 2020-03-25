@@ -75,6 +75,34 @@ defmodule AwsErin.DynamoDB do
   end
 
   @doc """
+  QueryAll.
+  """
+  @spec query_all(%Query.Request{}, list()) :: {:ok, %Query.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
+  def query_all(%Query.Request{} = request, options \\ []) do
+    query_all_internal(request, %Query.Response{count: 0, items: [], scanned_count: 0}, options)
+  end
+
+  defp query_all_internal(%Query.Request{} = request, %Query.Response{} = acc, options) do
+    case query(request, options) do
+      {:ok, %Query.Response{last_evaluated_key: nil} = response} ->
+        merge_query_response(acc, response)
+      {:ok, response} ->
+        IO.inspect response
+        query_all_internal(%{request | exclusive_start_key: response.last_evaluated_key}, merge_query_response(acc, response), options)
+      other ->
+        other
+    end
+  end
+
+  defp merge_query_response(%Query.Response{} = acc, %Query.Response{} = response) do
+    %{response | 
+      count: acc.count + response.count,
+      items: acc.items ++ response.items,
+      scanned_count: acc.scanned_count + response.scanned_count
+    }
+  end
+
+  @doc """
   Scan.
   """
   @spec scan(%Scan.Request{}, list()) :: {:ok, %Scan.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
