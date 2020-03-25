@@ -7,6 +7,12 @@ defmodule AwsErin.DynamoDB.Common do
   alias AwsErin.DynamoDB.Common.Item
   alias AwsErin.DynamoDB.Common.Attribute
   alias AwsErin.DynamoDB.Common.RequestItem
+  alias AwsErin.DynamoDB.Common.RequestWriteItems
+  alias AwsErin.DynamoDB.Common.RequestWriteItem
+  alias AwsErin.DynamoDB.Common.UnprocessedItems
+  alias AwsErin.DynamoDB.Common.UnprocessedItem
+  alias AwsErin.DynamoDB.Common.DeleteRequest
+  alias AwsErin.DynamoDB.Common.PutRequest
   alias AwsErin.DynamoDB.Common.ConsumedCapacity
   alias AwsErin.DynamoDB.Common.Capacity
   alias AwsErin.DynamoDB.Common.Table
@@ -151,6 +157,114 @@ defmodule AwsErin.DynamoDB.Common do
         keys: value |> Map.get("Keys") |> StructList.to_struct(Key),
         projection_expression: value |> Map.get("ProjectionExpression"),
         consistent_read: value |> Map.get("ConsistentRead")
+      }
+    end
+  end
+  defmodule RequestWriteItems do
+    defstruct [
+      :name,
+      :values
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{struct.name => struct.values |> Enum.map(&(&1 |> StructMap.to_map(RequestWriteItem)))}
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %RequestWriteItems{
+        name: map |> Map.keys |> List.first,
+        values: map |> Map.values |> List.first |> Enum.map(&(&1 |> StructMap.to_struct(RequestWriteItem)))
+      }
+    end
+  end
+  defmodule RequestWriteItem do
+    defstruct [
+      :delete_request,
+      :put_request
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{
+        "DeleteRequest" => struct.delete_request |> DeleteRequest.to_map,
+        "PutRequest" => struct.put_request |> PutRequest.to_map
+      }
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %RequestWriteItem{
+        delete_request: map |> Map.get("DeleteRequest") |> DeleteRequest.to_struct,
+        put_request: map |> Map.get("PutRequest") |> PutRequest.to_struct
+      }
+    end
+  end
+  defmodule UnprocessedItems do
+    defstruct [
+      :name,
+      :values
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{struct.name => struct.values |> Enum.map(&(&1 |> StructMap.to_map(UnprocessedItem)))}
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %UnprocessedItems{
+        name: map |> Map.keys |> List.first,
+        values: map |> Map.values |> List.first |> Enum.map(&(&1 |> StructMap.to_struct(UnprocessedItem)))
+      }
+    end
+  end
+  defmodule UnprocessedItem do
+    defstruct [
+      :delete_request,
+      :put_request
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{
+        "DeleteRequest" => struct.delete_request |> DeleteRequest.to_map,
+        "PutRequest" => struct.put_request |> PutRequest.to_map
+      }
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %UnprocessedItem{
+        delete_request: map |> Map.get("DeleteRequest") |> DeleteRequest.to_struct,
+        put_request: map |> Map.get("PutRequest") |> PutRequest.to_struct
+      }
+    end
+  end
+  defmodule DeleteRequest do
+    defstruct [
+      :key
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{
+        "Key" => struct.key |> StructMap.to_map(Key)
+      }
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %DeleteRequest{
+        key: map |> Map.get("Key") |> StructMap.to_struct(Key)
+      }
+    end
+  end
+  defmodule PutRequest do
+    defstruct [
+      :item
+    ]
+    def to_map(nil), do: nil
+    def to_map(struct) do
+      %{
+        "Item" => struct.item |> StructMap.to_map(Item)
+      }
+    end
+    def to_struct(nil), do: nil
+    def to_struct(map) do
+      %PutRequest{
+        item: map |> Map.get("Item") |> StructMap.to_struct(Item)
       }
     end
   end

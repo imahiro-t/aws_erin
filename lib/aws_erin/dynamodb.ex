@@ -4,10 +4,11 @@ defmodule AwsErin.DynamoDB do
   alias AwsErin.DynamoDB.Error
   alias AwsErin.DynamoDB.Error.UnknownServerError
   alias AwsErin.DynamoDB.GetItem
-  alias AwsErin.DynamoDB.BatchGetItem
   alias AwsErin.DynamoDB.PutItem
   alias AwsErin.DynamoDB.UpdateItem
   alias AwsErin.DynamoDB.DeleteItem
+  alias AwsErin.DynamoDB.BatchGetItem
+  alias AwsErin.DynamoDB.BatchWriteItem
   @dynamodb "dynamodb"
   @common_headers %{"Content-Type" => "application/x-amz-json-1.0"}
 
@@ -21,14 +22,6 @@ defmodule AwsErin.DynamoDB do
   @spec get_item(%GetItem.Request{}, list()) :: {:ok, %GetItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
   def get_item(%GetItem.Request{} = request, options \\ []) do
     process_request(request, options, "GetItem", GetItem.Request, GetItem.Response)
-  end
-
-  @doc """
-  BatchGetItem.
-  """
-  @spec batch_get_item(%BatchGetItem.Request{}, list()) :: {:ok, %BatchGetItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
-  def batch_get_item(%BatchGetItem.Request{} = request, options \\ []) do
-    process_request(request, options, "BatchGetItem", BatchGetItem.Request, BatchGetItem.Response)
   end
 
   @doc """
@@ -53,6 +46,22 @@ defmodule AwsErin.DynamoDB do
   @spec delete_item(%DeleteItem.Request{}, list()) :: {:ok, %DeleteItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
   def delete_item(%DeleteItem.Request{} = request, options \\ []) do
     process_request(request, options, "DeleteItem", DeleteItem.Request, DeleteItem.Response)
+  end
+
+  @doc """
+  BatchGetItem.
+  """
+  @spec batch_get_item(%BatchGetItem.Request{}, list()) :: {:ok, %BatchGetItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
+  def batch_get_item(%BatchGetItem.Request{} = request, options \\ []) do
+    process_request(request, options, "BatchGetItem", BatchGetItem.Request, BatchGetItem.Response)
+  end
+
+  @doc """
+  BatchWriteItem.
+  """
+  @spec batch_write_item(%BatchWriteItem.Request{}, list()) :: {:ok, %BatchWriteItem.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
+  def batch_write_item(%BatchWriteItem.Request{} = request, options \\ []) do
+    process_request(request, options, "BatchWriteItem", BatchWriteItem.Request, BatchWriteItem.Response)
   end
 
   defp process_request(request, options, name, request_struct, response_struct) do
