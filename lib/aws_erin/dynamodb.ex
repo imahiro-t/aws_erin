@@ -10,6 +10,7 @@ defmodule AwsErin.DynamoDB do
   alias AwsErin.DynamoDB.BatchGetItem
   alias AwsErin.DynamoDB.BatchWriteItem
   alias AwsErin.DynamoDB.Query
+  alias AwsErin.DynamoDB.Scan
   @dynamodb "dynamodb"
   @common_headers %{"Content-Type" => "application/x-amz-json-1.0"}
 
@@ -71,6 +72,14 @@ defmodule AwsErin.DynamoDB do
   @spec query(%Query.Request{}, list()) :: {:ok, %Query.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
   def query(%Query.Request{} = request, options \\ []) do
     process_request(request, options, "Query", Query.Request, Query.Response)
+  end
+
+  @doc """
+  Scan.
+  """
+  @spec scan(%Scan.Request{}, list()) :: {:ok, %Scan.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
+  def scan(%Scan.Request{} = request, options \\ []) do
+    process_request(request, options, "Scan", Scan.Request, Scan.Response)
   end
 
   defp process_request(request, options, name, request_struct, response_struct) do
