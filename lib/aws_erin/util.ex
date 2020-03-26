@@ -1,4 +1,5 @@
 defmodule AwsErin.Util do
+  use Bitwise
   @moduledoc """
   Documentation for Util.
   """
@@ -46,19 +47,19 @@ defmodule AwsErin.Util do
   end
 
   @doc """
-  Get configuration value for :aws_erin's application.
+  Generate UUID4 value.
   """
-  def fetch_env!(key) do
-    Application.fetch_env!(:aws_erin, key)
+  def uuid() do
+    <<b1 :: binary-size(5), x, b2 :: binary-size(1), y, b3 :: binary-size(8)>> = :crypto.strong_rand_bytes(16)
+    (b1 <> <<(x &&& 0x0f) ||| 0x40>> <> b2 <> <<(y &&& 0x3f) ||| 0x80>> <> b3) |> Base.encode16
   end
 
+  @doc """
+  Get reagion from options or system env.
+  """
   def get_region_name(options) do
     case Keyword.get(options, :aws_region) do
-      nil -> 
-        case fetch_env!(:aws_default_region) do
-          nil -> "us-east-1"
-          region -> region
-        end
+      nil -> System.get_env("AWS_REGION", "us-east-1")
       region -> region
     end
   end
