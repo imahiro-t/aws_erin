@@ -87,7 +87,6 @@ defmodule AwsErin.DynamoDB do
       {:ok, %Query.Response{last_evaluated_key: nil} = response} ->
         merge_query_response(acc, response)
       {:ok, response} ->
-        IO.inspect response
         query_all_internal(%{request | exclusive_start_key: response.last_evaluated_key}, merge_query_response(acc, response), options)
       other ->
         other
@@ -108,6 +107,34 @@ defmodule AwsErin.DynamoDB do
   @spec scan(%Scan.Request{}, list()) :: {:ok, %Scan.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
   def scan(%Scan.Request{} = request, options \\ []) do
     process_request(request, options, "Scan", Scan.Request, Scan.Response)
+  end
+
+
+  @doc """
+  ScanAll.
+  """
+  @spec scan_all(%Scan.Request{}, list()) :: {:ok, %Scan.Response{}} | {:error, %AwsErin.DynamoDB.Error{}}
+  def scan_all(%Scan.Request{} = request, options \\ []) do
+    scan_all_internal(request, %Scan.Response{count: 0, items: [], scanned_count: 0}, options)
+  end
+
+  defp scan_all_internal(%Scan.Request{} = request, %Scan.Response{} = acc, options) do
+    case scan(request, options) do
+      {:ok, %Scan.Response{last_evaluated_key: nil} = response} ->
+        merge_scan_response(acc, response)
+      {:ok, response} ->
+        scan_all_internal(%{request | exclusive_start_key: response.last_evaluated_key}, merge_scan_response(acc, response), options)
+      other ->
+        other
+    end
+  end
+
+  defp merge_scan_response(%Scan.Response{} = acc, %Scan.Response{} = response) do
+    %{response | 
+      count: acc.count + response.count,
+      items: acc.items ++ response.items,
+      scanned_count: acc.scanned_count + response.scanned_count
+    }
   end
 
   defp process_request(request, options, name, request_struct, response_struct) do

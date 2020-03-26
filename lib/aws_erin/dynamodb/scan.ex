@@ -1,6 +1,5 @@
 defmodule AwsErin.DynamoDB.Scan do
   alias AwsErin.DynamoDB.Common.StructMap
-  alias AwsErin.DynamoDB.Common.StructList
   alias AwsErin.DynamoDB.Common.Key
   alias AwsErin.DynamoDB.Common.ExpressionAttributeName
   alias AwsErin.DynamoDB.Common.Attribute
@@ -71,7 +70,7 @@ defmodule AwsErin.DynamoDB.Scan do
       %{
         "ConsumedCapacity" => struct.consumed_capacity |> ConsumedCapacity.to_map,
         "Count" => struct.count,
-        "Items" => struct.items |> StructList.to_map(Item),
+        "Items" => struct.items |> Enum.map(&(&1 |> StructMap.to_map(Item))),
         "LastEvaluatedKey" => struct.last_evaluated_key |> StructMap.to_map(Key),
         "ScannedCount" => struct.scanned_count
       }
@@ -80,7 +79,7 @@ defmodule AwsErin.DynamoDB.Scan do
       %Response{
         consumed_capacity: map |> Map.get("ConsumedCapacity") |> ConsumedCapacity.to_struct,
         count: map |> Map.get("Count"),
-        items: map |> Map.get("Items") |> StructList.to_struct(Item),
+        items: map |> Map.get("Items") |> Enum.map(&(&1 |> StructMap.to_struct(Item))),
         last_evaluated_key: map |> Map.get("LastEvaluatedKey") |> StructMap.to_struct(Key),
         scanned_count: map |> Map.get("ScannedCount")
       }

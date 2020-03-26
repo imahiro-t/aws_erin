@@ -1,6 +1,5 @@
 defmodule AwsErin.DynamoDB.Query do
   alias AwsErin.DynamoDB.Common.StructMap
-  alias AwsErin.DynamoDB.Common.StructList
   alias AwsErin.DynamoDB.Common.Key
   alias AwsErin.DynamoDB.Common.ExpressionAttributeName
   alias AwsErin.DynamoDB.Common.Attribute

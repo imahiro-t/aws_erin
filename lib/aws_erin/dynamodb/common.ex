@@ -381,7 +381,7 @@ defmodule AwsErin.DynamoDB.Common do
     def to_map(struct) do
       %{struct.name => %{
         "ExpressionAttributeNames" => struct.expression_attribute_names,
-        "Keys" => struct.keys |> StructList.to_map(Key),
+        "Keys" => struct.keys |> Enum.map(&(&1 |> StructMap.to_map(Key))),
         "ProjectionExpression" => struct.projection_expression,
         "ConsistentRead" => struct.consistent_read
       }}
@@ -392,7 +392,7 @@ defmodule AwsErin.DynamoDB.Common do
       %UnprocessedKey{
         name: map |> Map.keys |> List.first,
         expression_attribute_names: value |> Map.get("ExpressionAttributeNames"),
-        keys: value |> Map.get("Keys") |> StructList.to_struct(Key),
+        keys: value |> Map.get("Keys") |> Enum.map(&(&1 |> StructMap.to_struct(Key))),
         projection_expression: value |> Map.get("ProjectionExpression"),
         consistent_read: value |> Map.get("ConsistentRead")
       }
