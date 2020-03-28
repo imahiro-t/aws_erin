@@ -5,6 +5,7 @@ defmodule AwsErin.S3 do
   alias AwsErin.S3.Error.UnknownServerError
   alias AwsErin.S3.GetObject
   alias AwsErin.S3.PutObject
+  alias AwsErin.S3.DeleteObject
   @s3 "s3"
 
   @moduledoc """
@@ -13,7 +14,6 @@ defmodule AwsErin.S3 do
 
   @doc """
   GetObject.
-
   """
   @spec get_object(%GetObject.Request{}, list()) :: {:ok, %GetObject.Response{}} | {:error, %Error{}}
   def get_object(%GetObject.Request{} = request, options \\ []) do
@@ -26,7 +26,6 @@ defmodule AwsErin.S3 do
 
   @doc """
   PutObject.
-
   """
   @spec put_object(%PutObject.Request{}, list()) :: {:ok, %PutObject.Response{}} | {:error, %Error{}}
   def put_object(%PutObject.Request{} = request, options \\ []) do
@@ -39,15 +38,15 @@ defmodule AwsErin.S3 do
   end
 
   @doc """
-  Delete S3 object.
-
+  DeleteObject.
   """
-  def delete_object(bucket_name, key_name, options \\ []) do
-    headers = Map.new()
-    query_params = Map.new()
+  @spec delete_object(%DeleteObject.Request{}, list()) :: {:ok, %DeleteObject.Response{}} | {:error, %Error{}}
+  def delete_object(%DeleteObject.Request{} = request, options \\ []) do
+    headers = DeleteObject.Request.header_map(request)
+    query_params = DeleteObject.Request.query_map(request)
     region_name = options |> Util.get_region_name
-    endpoint_uri = get_endpoint_uri(bucket_name, key_name, region_name, query_params)
-    Http.delete(endpoint_uri, region_name, @s3, headers, options) |> response
+    endpoint_uri = get_endpoint_uri(request.bucket, request.key, region_name, query_params)
+    Http.delete(endpoint_uri, region_name, @s3, headers, options) |> to_response(DeleteObject.Response)
   end
 
   defp get_endpoint_uri(bucket_name, key_name, region_name, query_params) do
@@ -60,41 +59,9 @@ defmodule AwsErin.S3 do
     }
   end
 
-  # defp get_endpoint_uri(bucket_name, key_name, "us-east-1", query_params) do
-  #   %URI{
-  #     host: "s3.amazonaws.com",
-  #     path: "/#{bucket_name}/#{key_name}",
-  #     port: 443,
-  #     query: query_params |> URI.encode_query,
-  #     scheme: "https"
-  #   }
-  # end
-
-  # defp get_endpoint_uri(bucket_name, key_name, region_name, query_params) do
-  #   %URI{
-  #     host: "s3.#{region_name}.amazonaws.com",
-  #     path: "/#{bucket_name}/#{key_name}",
-  #     port: 443,
-  #     query: query_params |> URI.encode_query,
-  #     scheme: "https"
-  #   }
-  # end
-
-  defp response(res) do
-    case res do
-      {:ok, %{body: body}} ->
-        reg = ~r/\A<\?xml version="1.0" encoding="UTF-8"\?>\n<Error><Code>(?<code>.*?)<\/Code>.*<Message>(?<message>.*?)<\/Message>.*/
-        case reg |> Regex.named_captures(body) do
-          %{"code" => code, "message" => message} -> {:error, {code, message}}
-          _ -> {:ok, body}
-        end
-      {:error, %{reason: reason}} -> {:error, reason}
-    end
-  end
-
   defp to_response(response, struct) do
     case response do
-      {:ok, %{headers: headers, body: body, status_code: 200}} ->
+      {:ok, %{headers: headers, body: body, status_code: status_code}} when status_code == 200 or status_code == 204 ->
         {:ok, struct.to_struct(headers, body)}
       {:ok, %{body: body, status_code: status_code}} ->
         {:error, Error.to_error(status_code, body)}
