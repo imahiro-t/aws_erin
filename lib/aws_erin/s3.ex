@@ -4,6 +4,7 @@ defmodule AwsErin.S3 do
   alias AwsErin.S3.Error
   alias AwsErin.S3.Error.UnknownServerError
   alias AwsErin.S3.GetObject
+  alias AwsErin.S3.PutObject
   @s3 "s3"
 
   @moduledoc """
@@ -11,30 +12,30 @@ defmodule AwsErin.S3 do
   """
 
   @doc """
-  Get S3 object.
+  GetObject.
 
   """
   @spec get_object(%GetObject.Request{}, list()) :: {:ok, %GetObject.Response{}} | {:error, %Error{}}
   def get_object(%GetObject.Request{} = request, options \\ []) do
-    headers = Map.new() |> GetObject.Request.header_map(request)
-    query_params = Map.new() |> GetObject.Request.query_map(request)
+    headers = GetObject.Request.header_map(request)
+    query_params = GetObject.Request.query_map(request)
     region_name = options |> Util.get_region_name
     endpoint_uri = get_endpoint_uri(request.bucket, request.key, region_name, query_params)
     Http.get(endpoint_uri, region_name, @s3, headers, options) |> to_response(GetObject.Response)
   end
 
   @doc """
-  Put S3 object.
+  PutObject.
 
   """
-  def put_object(bucket_name, key_name, body, options \\ []) do
-    headers =
-      Map.new()
-      |> Map.put("content-length", "#{body |> byte_size}")
-    query_params = Map.new()
+  @spec put_object(%PutObject.Request{}, list()) :: {:ok, %PutObject.Response{}} | {:error, %Error{}}
+  def put_object(%PutObject.Request{} = request, options \\ []) do
+    request = %{request | content_length: "#{request.body |> byte_size}"}
+    headers = PutObject.Request.header_map(request)
+    query_params = PutObject.Request.query_map(request)
     region_name = options |> Util.get_region_name
-    endpoint_uri = get_endpoint_uri(bucket_name, key_name, region_name, query_params)
-    Http.put(endpoint_uri, region_name, @s3, headers, body, options) |> response
+    endpoint_uri = get_endpoint_uri(request.bucket, request.key, region_name, query_params)
+    Http.put(endpoint_uri, region_name, @s3, headers, request.body, options) |> to_response(PutObject.Response)
   end
 
   @doc """
