@@ -1,4 +1,5 @@
 defmodule AwsErin.DynamoDB.DeleteItem do
+  alias AwsErin.DynamoDB.Behaviour
   alias AwsErin.DynamoDB.Common.StructMap
   alias AwsErin.DynamoDB.Common.Key
   alias AwsErin.DynamoDB.Common.ExpressionAttributeName
@@ -7,6 +8,7 @@ defmodule AwsErin.DynamoDB.DeleteItem do
   alias AwsErin.DynamoDB.Common.ItemCollectionMetrics
 
   defmodule Request do
+    @behaviour Behaviour.Request
     defstruct [
       :key,
       :table_name,
@@ -44,6 +46,7 @@ defmodule AwsErin.DynamoDB.DeleteItem do
   end
 
   defmodule Response do
+    @behaviour Behaviour.Response
     defstruct [
       :attributes,
       :consumed_capacity,

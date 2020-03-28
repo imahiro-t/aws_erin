@@ -1,14 +1,14 @@
 defmodule AwsErin.DynamoDB.BatchGetItem do
+  alias AwsErin.DynamoDB.Behaviour
   alias AwsErin.DynamoDB.Common.StructList
   alias AwsErin.DynamoDB.Common.StructMap
   alias AwsErin.DynamoDB.Common.RequestItem
   alias AwsErin.DynamoDB.Common.ConsumedCapacity
   alias AwsErin.DynamoDB.Common.Response, as: CmnResponse
   alias AwsErin.DynamoDB.Common.UnprocessedKey
-  alias AwsErin.DynamoDB.BatchGetItem.Request
-  alias AwsErin.DynamoDB.BatchGetItem.Response
 
   defmodule Request do
+    @behaviour Behaviour.Request
     defstruct [
       :request_items,
       :return_consumed_capacity
@@ -28,6 +28,7 @@ defmodule AwsErin.DynamoDB.BatchGetItem do
   end
 
   defmodule Response do
+    @behaviour Behaviour.Response
     defstruct [
       :consumed_capacity,
       :responses,

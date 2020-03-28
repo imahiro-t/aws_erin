@@ -1,4 +1,5 @@
 defmodule AwsErin.DynamoDB.GetItem do
+  alias AwsErin.DynamoDB.Behaviour
   alias AwsErin.DynamoDB.Common.StructMap
   alias AwsErin.DynamoDB.Common.Key
   alias AwsErin.DynamoDB.Common.ExpressionAttributeName
@@ -6,6 +7,7 @@ defmodule AwsErin.DynamoDB.GetItem do
   alias AwsErin.DynamoDB.Common.Item
 
   defmodule Request do
+    @behaviour Behaviour.Request
     defstruct [
       :key,
       :table_name,
@@ -37,6 +39,7 @@ defmodule AwsErin.DynamoDB.GetItem do
   end
 
   defmodule Response do
+    @behaviour Behaviour.Response
     defstruct [
       :consumed_capacity,
       :item

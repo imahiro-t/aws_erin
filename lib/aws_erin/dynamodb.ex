@@ -1,5 +1,6 @@
 defmodule AwsErin.DynamoDB do
   alias AwsErin.Util
+  alias AwsErin.Json
   alias AwsErin.Http
   alias AwsErin.DynamoDB.Error
   alias AwsErin.DynamoDB.Error.UnknownServerError
@@ -142,7 +143,7 @@ defmodule AwsErin.DynamoDB do
     |> Map.put("X-Amz-Target", "DynamoDB_20120810.#{name}")
     region_name = options |> Util.get_region_name
     endpoint_uri = get_endpoint_uri(region_name)
-    Http.post(endpoint_uri, region_name, @dynamodb, headers, request |> request_struct.to_map |> Jason.encode!, options)
+    Http.post(endpoint_uri, region_name, @dynamodb, headers, request |> request_struct.to_map |> Json.encode, options)
     |> to_response(response_struct)
   end
 
@@ -157,12 +158,12 @@ defmodule AwsErin.DynamoDB do
   defp to_response(response, struct) do
     case response do
       {:ok, %{body: body, status_code: status_code}} when status_code == 400 or status_code == 500 ->
-        case body |> Jason.decode! do
+        case body |> Json.decode do
           %{"__type" => code, "message" => message} -> {:error, Error.to_error(status_code, code, message)}
           %{"__type" => code, "Message" => message} -> {:error, Error.to_error(status_code, code, message)}
         end
       {:ok, %{body: body, status_code: 200}} ->
-        case body |> Jason.decode! do
+        case body |> Json.decode do
           map -> {:ok, map |> struct.to_struct}
         end
       {:error, %{reason: reason}} -> {:error, %UnknownServerError{message: reason}}
