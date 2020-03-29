@@ -9,6 +9,16 @@ defmodule AwsErin.DynamoDB.DeleteItem do
 
   defmodule Request do
     @behaviour Behaviour.Request
+    @type t :: %__MODULE__{
+      key: list(Key.t),
+      table_name: String.t,
+      condition_expression: String.t,
+      expression_attribute_names: ExpressionAttributeName.t,
+      expression_attribute_values: list(Attribute.t),
+      return_consumed_capacity: String.t,
+      return_item_collection_metrics: String.t,
+      return_values: String.t
+    }
     defstruct [
       :key,
       :table_name,
@@ -47,6 +57,11 @@ defmodule AwsErin.DynamoDB.DeleteItem do
 
   defmodule Response do
     @behaviour Behaviour.Response
+    @type t :: %__MODULE__{
+      attributes: list(Attribute.t),
+      consumed_capacity: ConsumedCapacity.t,
+      item_collection_metrics: ItemCollectionMetrics.t
+    }
     defstruct [
       :attributes,
       :consumed_capacity,

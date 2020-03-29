@@ -8,6 +8,14 @@ defmodule AwsErin.DynamoDB.GetItem do
 
   defmodule Request do
     @behaviour Behaviour.Request
+    @type t :: %__MODULE__{
+      key: list(Key.t),
+      table_name: String.t,
+      expression_attribute_names: ExpressionAttributeName.t,
+      projection_expression: String.t,
+      return_consumed_capacity: String.t,
+      consistent_read: boolean
+    }
     defstruct [
       :key,
       :table_name,
@@ -40,6 +48,10 @@ defmodule AwsErin.DynamoDB.GetItem do
 
   defmodule Response do
     @behaviour Behaviour.Response
+    @type t :: %__MODULE__{
+      consumed_capacity: ConsumedCapacity.t,
+      item: list(Item.t)
+    }
     defstruct [
       :consumed_capacity,
       :item

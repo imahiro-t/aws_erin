@@ -9,6 +9,21 @@ defmodule AwsErin.DynamoDB.Scan do
 
   defmodule Request do
     @behaviour Behaviour.Request
+    @type t :: %__MODULE__{
+      exclusive_start_key: list(Key.t),
+      table_name: String.t,
+      expression_attribute_names: ExpressionAttributeName.t,
+      expression_attribute_values: list(Attribute.t),
+      filter_expression: String.t,
+      index_name: String.t,
+      limit: integer,
+      projection_expression: String.t,
+      return_consumed_capacity: String.t,
+      segment: String.t,
+      select: String.t,
+      total_segments: String.t,
+      consistent_read: boolean,
+    }
     defstruct [
       :exclusive_start_key,
       :table_name,
@@ -62,6 +77,13 @@ defmodule AwsErin.DynamoDB.Scan do
 
   defmodule Response do
     @behaviour Behaviour.Response
+    @type t :: %__MODULE__{
+      consumed_capacity: ConsumedCapacity.t,
+      count: integer,
+      items: list(Item.t),
+      last_evaluated_key: list(Key.t),
+      scanned_count: integer
+    }
     defstruct [
       :consumed_capacity,
       :count,

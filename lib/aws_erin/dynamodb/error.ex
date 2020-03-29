@@ -1,5 +1,10 @@
 defmodule AwsErin.DynamoDB.Error do
+
+  @type t :: %__MODULE__{
+    message: String.t
+  }
   defstruct [ :message ]
+
   defmodule UnknownServerError, do: defstruct [ :message ]
   defmodule InternalServerError, do: defstruct [ :message ]
   defmodule ProvisionedThroughputExceededException, do: defstruct [ :message ]

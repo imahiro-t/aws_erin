@@ -76,6 +76,11 @@ defmodule AwsErin.DynamoDB.Common do
   end
 
   defmodule Key do
+    @type t :: %__MODULE__{
+      name: String.t,
+      value: String.t,
+      options: nil | term
+    }
     defstruct [
       :name,
       :value,
@@ -98,6 +103,10 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule Item do
+    @type t :: %__MODULE__{
+      name: String.t,
+      value: String.t
+    }
     defstruct [
       :name,
       :value
@@ -115,6 +124,10 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule Attribute do
+    @type t :: %__MODULE__{
+      name: String.t,
+      value: String.t
+    }
     defstruct [
       :name,
       :value
@@ -132,6 +145,13 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule RequestItem do
+    @type t :: %__MODULE__{
+      name: String.t,
+      expression_attribute_names: String.t,
+      keys: list(Key.t),
+      projection_expression: String.t,
+      consistent_read: boolean
+    }
     defstruct [
       :name,
       :expression_attribute_names,
@@ -161,6 +181,10 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule RequestWriteItems do
+    @type t :: %__MODULE__{
+      name: String.t,
+      values: list(RequestWriteItem.t)
+    }
     defstruct [
       :name,
       :values
@@ -178,6 +202,10 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule RequestWriteItem do
+    @type t :: %__MODULE__{
+      delete_request: DeleteRequest.t,
+      put_request: PutRequest.t
+    }
     defstruct [
       :delete_request,
       :put_request
@@ -198,6 +226,10 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule UnprocessedItems do
+    @type t :: %__MODULE__{
+      name: String.t,
+      values: list(UnprocessedItem.t)
+    }
     defstruct [
       :name,
       :values
@@ -215,6 +247,10 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule UnprocessedItem do
+    @type t :: %__MODULE__{
+      delete_request: DeleteRequest.t,
+      put_request: PutRequest.t
+    }
     defstruct [
       :delete_request,
       :put_request
@@ -235,6 +271,9 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule DeleteRequest do
+    @type t :: %__MODULE__{
+      key: list(Key.t)
+    }
     defstruct [
       :key
     ]
@@ -252,6 +291,9 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule PutRequest do
+    @type t :: %__MODULE__{
+      item: list(Item.t)
+    }
     defstruct [
       :item
     ]
@@ -269,6 +311,15 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule ConsumedCapacity do
+    @type t :: %__MODULE__{
+      capacity_units: String.t,
+      global_secondary_indexes: list(Capacity.t),
+      local_secondary_indexes: list(Capacity.t),
+      read_capacity_units: String.t,
+      table: Table.t,
+      table_name: String.t,
+      write_capacity_units: String.t,
+    }
     defstruct [
       :capacity_units,
       :global_secondary_indexes,
@@ -304,6 +355,12 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule Capacity do
+    @type t :: %__MODULE__{
+      name: String.t,
+      capacity_units: String.t,
+      read_capacity_units: String.t,
+      write_capacity_units: String.t,
+    }
     defstruct [
       :name,
       :capacity_units,
@@ -330,6 +387,11 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule Table do
+    @type t :: %__MODULE__{
+      capacity_units: String.t,
+      read_capacity_units: String.t,
+      write_capacity_units: String.t,
+    }
     defstruct [
       :capacity_units,
       :read_capacity_units,
@@ -353,6 +415,10 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule Response do
+    @type t :: %__MODULE__{
+      name: String.t,
+      values: list(Key.t)
+    }
     defstruct [
       :name,
       :values
@@ -370,6 +436,13 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule UnprocessedKey do
+    @type t :: %__MODULE__{
+      name: String.t,
+      expression_attribute_names: String.t,
+      keys: list(Key.t),
+      projection_expression: String.t,
+      consistent_read: String.t
+    }
     defstruct [
       :name,
       :expression_attribute_names,
@@ -399,6 +472,10 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule ExpressionAttributeName do
+    @type t :: %__MODULE__{
+      name: String.t,
+      value: String.t
+    }
     defstruct [
       :name,
       :value
@@ -416,6 +493,10 @@ defmodule AwsErin.DynamoDB.Common do
     end
   end
   defmodule ItemCollectionMetrics do
+    @type t :: %__MODULE__{
+      item_collection_key: list(Key.t),
+      size_estimate_range_gb: String.t
+    }
     defstruct [
       :item_collection_key,
       :size_estimate_range_gb

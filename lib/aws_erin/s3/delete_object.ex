@@ -3,6 +3,14 @@ defmodule AwsErin.S3.DeleteObject do
 
   defmodule Request do
     @behaviour Behaviour.Request
+    @type t :: %__MODULE__{
+      bucket: String.t,
+      key: String.t,
+      version_id: String.t,
+      x_amz_mfa: String.t,
+      x_amz_request_payer: String.t,
+      x_amz_bypass_governance_retention: String.t
+    }
     defstruct [
       :bucket,
       :key,
@@ -25,6 +33,11 @@ defmodule AwsErin.S3.DeleteObject do
 
   defmodule Response do
     @behaviour Behaviour.Response
+    @type t :: %__MODULE__{
+      x_amz_delete_marker: String.t,
+      x_amz_version_id: String.t,
+      x_amz_request_charged: String.t
+    }
     defstruct [
       :x_amz_delete_marker,
       :x_amz_version_id,

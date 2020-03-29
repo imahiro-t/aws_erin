@@ -3,6 +3,37 @@ defmodule AwsErin.S3.PutObject do
 
   defmodule Request do
     @behaviour Behaviour.Request
+    @type t :: %__MODULE__{
+      body: String.t,
+      bucket: String.t,
+      key: String.t,
+      x_amz_acl: String.t,
+      cache_control: String.t,
+      content_disposition: String.t,
+      content_encoding: String.t,
+      content_language: String.t,
+      content_length: String.t,
+      content_md5: String.t,
+      content_type: String.t,
+      expires: String.t,
+      x_amz_grant_full_control: String.t,
+      x_amz_grant_read: String.t,
+      x_amz_grant_read_acp: String.t,
+      x_amz_grant_write_acp: String.t,
+      x_amz_server_side_encryption: String.t,
+      x_amz_storage_class: String.t,
+      x_amz_website_redirect_location: String.t,
+      x_amz_server_side_encryption_customer_algorithm: String.t,
+      x_amz_server_side_encryption_customer_key: String.t,
+      x_amz_server_side_encryption_customer_key_md5: String.t,
+      x_amz_server_side_encryption_aws_kms_key_id: String.t,
+      x_amz_server_side_encryption_context: String.t,
+      x_amz_request_payer: String.t,
+      x_amz_tagging: String.t,
+      x_amz_object_lock_mode: String.t,
+      x_amz_object_lock_retain_until_date: String.t,
+      x_amz_object_lock_legal_hold: String.t
+    }
     defstruct [
       :body,
       :bucket,
@@ -70,6 +101,17 @@ defmodule AwsErin.S3.PutObject do
 
   defmodule Response do
     @behaviour Behaviour.Response
+    @type t :: %__MODULE__{
+      x_amz_expiration: String.t,
+      e_tag: String.t,
+      x_amz_server_side_encryption: String.t,
+      x_amz_version_id: String.t,
+      x_amz_server_side_encryption_customer_algorithm: String.t,
+      x_amz_server_side_encryption_customer_key_md5: String.t,
+      x_amz_server_side_encryption_aws_kms_key_id: String.t,
+      x_amz_server_side_encryption_context: String.t,
+      x_amz_request_charged: String.t
+    }
     defstruct [
       :x_amz_expiration,
       :e_tag,

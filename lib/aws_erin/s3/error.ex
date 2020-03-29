@@ -1,7 +1,13 @@
 defmodule AwsErin.S3.Error do
   alias AwsErin.Xml
 
+  @type t :: %__MODULE__{
+    message: String.t,
+    request_id: String.t,
+    raw: String.t
+  }
   defstruct [ :message, :request_id, :raw ]
+
   defmodule UnknownServerError, do: defstruct [ :message, :request_id, :raw ]
   defmodule AccessDenied, do: defstruct [ :message, :request_id, :raw ]
   defmodule AccountProblem, do: defstruct [ :message, :request_id, :raw ]
@@ -87,7 +93,7 @@ defmodule AwsErin.S3.Error do
   defmodule UserKeyMustBeSpecified, do: defstruct [ :message, :request_id, :raw ]
 
   def to_error(status_code, xml) when xml |> is_binary do
-    to_error(status_code, Xml.decode(xml) |> Map.get("Error"))
+    to_error(status_code, xml |> Xml.decode |> Map.get("Error"))
   end
 
   def to_error(301, %{"Code" => code, "Message" => message, "RequestId" => request_id} = error) do

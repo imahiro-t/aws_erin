@@ -3,6 +3,27 @@ defmodule AwsErin.S3.GetObject do
 
   defmodule Request do
     @behaviour Behaviour.Request
+    @type t :: %__MODULE__{
+      bucket: String.t,
+      key: String.t,
+      part_number: String.t,
+      response_cache_control: String.t,
+      response_content_disposition: String.t,
+      response_content_encoding: String.t,
+      response_content_language: String.t,
+      response_content_type: String.t,
+      response_expires: String.t,
+      version_id: String.t,
+      if_match: String.t,
+      if_modified_since: String.t,
+      if_none_match: String.t,
+      if_unmodified_since: String.t,
+      range: String.t,
+      x_amz_server_side_encryption_customer_algorithm: String.t,
+      x_amz_server_side_encryption_customer_key: String.t,
+      x_amz_server_side_encryption_customer_key_md5: String.t,
+      x_amz_request_payer: String.t  
+    }
     defstruct [
       :bucket,
       :key,
@@ -51,6 +72,38 @@ defmodule AwsErin.S3.GetObject do
 
   defmodule Response do
     @behaviour Behaviour.Response
+    @type t :: %__MODULE__{
+      body: String.t,
+      x_amz_delete_marker: String.t,
+      accept_ranges: String.t,
+      x_amz_expiration: String.t,
+      x_amz_restore: String.t,
+      last_modified: String.t,
+      content_length: String.t,
+      e_tag: String.t,
+      x_amz_missing_meta: String.t,
+      x_amz_version_id: String.t,
+      cache_control: String.t,
+      content_disposition: String.t,
+      content_encoding: String.t,
+      content_language: String.t,
+      content_range: String.t,
+      content_type: String.t,
+      expires: String.t,
+      x_amz_website_redirect_location: String.t,
+      x_amz_server_side_encryption: String.t,
+      x_amz_server_side_encryption_customer_algorithm: String.t,
+      x_amz_server_side_encryption_customer_key_md5: String.t,
+      x_amz_server_side_encryption_aws_kms_key_id: String.t,
+      x_amz_storage_class: String.t,
+      x_amz_request_charged: String.t,
+      x_amz_replication_status: String.t,
+      x_amz_mp_parts_count: String.t,
+      x_amz_tagging_count: String.t,
+      x_amz_object_lock_mode: String.t,
+      x_amz_object_lock_retain_until_date: String.t,
+      x_amz_object_lock_legal_hold: String.t
+    }
     defstruct [
       :body,
       :x_amz_delete_marker,

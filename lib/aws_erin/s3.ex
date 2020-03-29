@@ -6,6 +6,7 @@ defmodule AwsErin.S3 do
   alias AwsErin.S3.GetObject
   alias AwsErin.S3.PutObject
   alias AwsErin.S3.DeleteObject
+  alias AwsErin.S3.DeleteObjects
   @s3 "s3"
 
   @moduledoc """
@@ -29,7 +30,6 @@ defmodule AwsErin.S3 do
   """
   @spec put_object(%PutObject.Request{}, list()) :: {:ok, %PutObject.Response{}} | {:error, %Error{}}
   def put_object(%PutObject.Request{} = request, options \\ []) do
-    request = %{request | content_length: "#{request.body |> byte_size}"}
     headers = PutObject.Request.header_map(request)
     query_params = PutObject.Request.query_map(request)
     region_name = options |> Util.get_region_name
@@ -47,6 +47,20 @@ defmodule AwsErin.S3 do
     region_name = options |> Util.get_region_name
     endpoint_uri = get_endpoint_uri(request.bucket, request.key, region_name, query_params)
     Http.delete(endpoint_uri, region_name, @s3, headers, options) |> to_response(DeleteObject.Response)
+  end
+
+  @doc """
+  DeleteObjects.
+  """
+  @spec delete_objects(%DeleteObjects.Request{}, list()) :: {:ok, %DeleteObjects.Response{}} | {:error, %Error{}}
+  def delete_objects(%DeleteObjects.Request{} = request, options \\ []) do
+    body = DeleteObjects.Request.body(request)
+    headers = DeleteObjects.Request.header_map(request)
+    |> Map.put("Content-MD5", :crypto.hash(:md5, body) |> Base.encode64)
+    query_params = DeleteObjects.Request.query_map(request)
+    region_name = options |> Util.get_region_name
+    endpoint_uri = get_endpoint_uri(request.bucket, "", region_name, query_params)
+    Http.post(endpoint_uri, region_name, @s3, headers, body, options) |> to_response(DeleteObjects.Response)
   end
 
   defp get_endpoint_uri(bucket_name, key_name, region_name, query_params) do

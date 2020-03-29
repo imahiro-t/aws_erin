@@ -9,6 +9,10 @@ defmodule AwsErin.DynamoDB.BatchGetItem do
 
   defmodule Request do
     @behaviour Behaviour.Request
+    @type t :: %__MODULE__{
+      request_items: list(RequestItem.t),
+      return_consumed_capacity: String.t
+    }
     defstruct [
       :request_items,
       :return_consumed_capacity
@@ -29,6 +33,11 @@ defmodule AwsErin.DynamoDB.BatchGetItem do
 
   defmodule Response do
     @behaviour Behaviour.Response
+    @type t :: %__MODULE__{
+      consumed_capacity: list(ConsumedCapacity.t),
+      responses: list(CmnResponse.t),
+      unprocessed_keys: list(UnprocessedKey.t)
+    }
     defstruct [
       :consumed_capacity,
       :responses,
