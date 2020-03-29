@@ -10,7 +10,7 @@ defmodule AwsErin.Http do
   POST AWS rest api.
 
   """
-  @spec post(%URI{}, String.t, String.t, map(), String.t, list()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
+  @spec post(%URI{}, String.t, String.t, map(), String.t, keyword()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
   def post(endpoint_uri, region_name, service_name, headers = %{}, request_payload, options) do
     request(endpoint_uri, "POST", region_name, service_name, headers, request_payload, options)
   end
@@ -19,7 +19,7 @@ defmodule AwsErin.Http do
   PUT AWS rest api.
 
   """
-  @spec put(%URI{}, String.t, String.t, map(), String.t, list()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
+  @spec put(%URI{}, String.t, String.t, map(), String.t, keyword()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
   def put(endpoint_uri, region_name, service_name, headers = %{}, request_payload, options) do
     request(endpoint_uri, "PUT", region_name, service_name, headers, request_payload, options)
   end
@@ -28,7 +28,7 @@ defmodule AwsErin.Http do
   GET AWS rest api.
 
   """
-  @spec get(%URI{}, String.t, String.t, map(), list()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
+  @spec get(%URI{}, String.t, String.t, map(), keyword()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
   def get(endpoint_uri, region_name, service_name, headers = %{}, options) do
     request(endpoint_uri, "GET", region_name, service_name, headers, "", options)
   end
@@ -37,7 +37,7 @@ defmodule AwsErin.Http do
   DELETE AWS rest api.
 
   """
-  @spec delete(%URI{}, String.t, String.t, map(), list()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
+  @spec delete(%URI{}, String.t, String.t, map(), keyword()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
   def delete(endpoint_uri, region_name, service_name, headers = %{}, options) do
     request(endpoint_uri, "DELETE", region_name, service_name, headers, "", options)
   end
@@ -46,7 +46,7 @@ defmodule AwsErin.Http do
   Request AWS rest api.
 
   """
-  @spec request(%URI{}, String.t, String.t, String.t, map(), String.t, list()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
+  @spec request(%URI{}, String.t, String.t, String.t, map(), String.t, keyword()) :: {:ok, %HTTPoison.Response{}} | {:error, %HTTPoison.Error{}}
   def request(
         %URI{host: host} = endpoint_uri,
         http_request_method,

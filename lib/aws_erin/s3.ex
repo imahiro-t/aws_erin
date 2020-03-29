@@ -16,7 +16,7 @@ defmodule AwsErin.S3 do
   @doc """
   GetObject.
   """
-  @spec get_object(%GetObject.Request{}, list()) :: {:ok, %GetObject.Response{}} | {:error, %Error{}}
+  @spec get_object(%GetObject.Request{}, keyword()) :: {:ok, %GetObject.Response{}} | {:error, %Error{}}
   def get_object(%GetObject.Request{} = request, options \\ []) do
     headers = GetObject.Request.header_map(request)
     query_params = GetObject.Request.query_map(request)
@@ -28,7 +28,7 @@ defmodule AwsErin.S3 do
   @doc """
   PutObject.
   """
-  @spec put_object(%PutObject.Request{}, list()) :: {:ok, %PutObject.Response{}} | {:error, %Error{}}
+  @spec put_object(%PutObject.Request{}, keyword()) :: {:ok, %PutObject.Response{}} | {:error, %Error{}}
   def put_object(%PutObject.Request{} = request, options \\ []) do
     headers = PutObject.Request.header_map(request)
     query_params = PutObject.Request.query_map(request)
@@ -40,7 +40,7 @@ defmodule AwsErin.S3 do
   @doc """
   DeleteObject.
   """
-  @spec delete_object(%DeleteObject.Request{}, list()) :: {:ok, %DeleteObject.Response{}} | {:error, %Error{}}
+  @spec delete_object(%DeleteObject.Request{}, keyword()) :: {:ok, %DeleteObject.Response{}} | {:error, %Error{}}
   def delete_object(%DeleteObject.Request{} = request, options \\ []) do
     headers = DeleteObject.Request.header_map(request)
     query_params = DeleteObject.Request.query_map(request)
@@ -52,7 +52,7 @@ defmodule AwsErin.S3 do
   @doc """
   DeleteObjects.
   """
-  @spec delete_objects(%DeleteObjects.Request{}, list()) :: {:ok, %DeleteObjects.Response{}} | {:error, %Error{}}
+  @spec delete_objects(%DeleteObjects.Request{}, keyword()) :: {:ok, %DeleteObjects.Response{}} | {:error, %Error{}}
   def delete_objects(%DeleteObjects.Request{} = request, options \\ []) do
     body = DeleteObjects.Request.body(request)
     headers = DeleteObjects.Request.header_map(request)

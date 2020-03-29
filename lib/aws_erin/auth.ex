@@ -12,6 +12,7 @@ defmodule AwsErin.Auth do
   Get authorization for AWS.
 
   """
+  @spec get_authorization(String.t, String.t, %URI{}, String.t, String.t, String.t, String.t, map(), String.t) :: String.t
   def get_authorization(
         aws_access_key,
         aws_secret_key,
