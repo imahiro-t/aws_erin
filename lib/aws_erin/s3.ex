@@ -7,6 +7,7 @@ defmodule AwsErin.S3 do
   alias AwsErin.S3.PutObject
   alias AwsErin.S3.DeleteObject
   alias AwsErin.S3.DeleteObjects
+  alias AwsErin.S3.ListObjects
   @s3 "s3"
 
   @moduledoc """
@@ -61,6 +62,18 @@ defmodule AwsErin.S3 do
     region_name = options |> Util.get_region_name
     endpoint_uri = get_endpoint_uri(request.bucket, "", region_name, query_params)
     Http.post(endpoint_uri, region_name, @s3, headers, body, options) |> to_response(DeleteObjects.Response)
+  end
+
+  @doc """
+  ListObjects.
+  """
+  @spec list_objects(%ListObjects.Request{}, keyword()) :: {:ok, %ListObjects.Response{}} | {:error, %Error{}}
+  def list_objects(%ListObjects.Request{} = request, options \\ []) do
+    headers = ListObjects.Request.header_map(request)
+    query_params = ListObjects.Request.query_map(request)
+    region_name = options |> Util.get_region_name
+    endpoint_uri = get_endpoint_uri(request.bucket, "", region_name, query_params)
+    Http.get(endpoint_uri, region_name, @s3, headers, options) |> to_response(ListObjects.Response)
   end
 
   defp get_endpoint_uri(bucket_name, key_name, region_name, query_params) do
