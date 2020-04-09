@@ -141,17 +141,29 @@ defmodule AwsErin.DynamoDB do
     headers = @common_headers
     |> Map.put("X-Amz-Target", "DynamoDB_20120810.#{name}")
     region_name = options |> Util.get_region_name
-    endpoint_uri = get_endpoint_uri(region_name)
+    endpoint_uri = get_endpoint_uri(region_name, options)
     Http.post(endpoint_uri, region_name, @dynamodb, headers, request |> request_struct.to_map |> Jason.encode!, options)
     |> to_response(response_struct)
   end
 
-  defp get_endpoint_uri(region_name) do
-    %URI{
-      host: "dynamodb.#{region_name}.amazonaws.com",
-      port: 443,
-      scheme: "https"
-    }
+  defp get_endpoint_uri(region_name, options) do
+    case options |> get_dynamodb_endpoint do
+      nil ->
+        %URI{
+          host: "dynamodb.#{region_name}.amazonaws.com",
+          port: 443,
+          scheme: "https"
+        }
+      value ->
+        value |> URI.parse
+    end
+  end
+
+  defp get_dynamodb_endpoint(options) do
+    case options |> Keyword.get(:dynamodb_endpoint) do
+      nil -> System.get_env("DYNAMODB_ENDPOINT")
+      value -> value
+    end
   end
 
   defp to_response(response, struct) do
